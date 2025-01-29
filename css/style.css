@@ -1,0 +1,54 @@
+/*design the map style*/
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+  .popup-tabs {
+      font-family: Arial, sans-serif;
+      width: 250px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      border-bottom: 1px solid #ff0505;
+      margin-bottom: 10px;
+    }
+
+    .tab-link {
+      flex: 1;
+      padding: 8px;
+      background-color: #ff0505;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .tab-link.active {
+      background-color: #fff;
+      border-bottom: 2px solid #007bff;
+    }
+
+    .tab-content {
+      display: none;
+      font-size: 14px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Styles for the building thumbnail in the popup */
+    .popup-thumbnail {
+        width: 100%;          
+        max-height: 150px;    
+        object-fit: cover;    
+        margin-top: 10px;     
+        border-radius: 5px;   
+    }
+  
