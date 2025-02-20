@@ -3,25 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>UW Reseach Cores Map</title>
+  <!--load style sheet-->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <style>   
-    
-  </style>
+  <!--load fonts-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  
 </head>
 <body>
+  <!--sidebar-->
   <div id="sidebar">
-    <button id="reset">Reset</button>
+    <h1>UW Research Cores</h1>
     <div id="search-bar">
-      <input id="search" type="text" placeholder="Search..">
-      <div id="suggestions"></div>
+      <input id="search" autocomplete="off" type="text" placeholder="Search..">
     </div>
+    <button id="reset">Reset Map</button>
     <div id="directory"></div>
   </div>
+  <!--map-->
   <div id="map"></div>
-
+  <!--load scripts-->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script type="text/javascript" src="lib/papaparse.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
 </body>

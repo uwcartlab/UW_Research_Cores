@@ -1,100 +1,31 @@
-/*design the map style*/
+/*BACKGROUND*/
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: "EB Garamond", serif;
 }
+h1{
+  font-family: "Red Hat Display", serif;
+  color:rgb(197, 5, 12);
+}
+/*SIDEBAR*/
 #sidebar{
-  width:300px;
-  height:100%;
+  width:320px;
+  padding:15px;
+  height:calc(100% - 30px);
   display:inline-block;
   position:absolute;
   overflow:scroll;
+  border-right:2px solid black;
+  z-index:500;
 }
-#directory{
-  margin-top:75px;
-}
-.directory-link{
-  cursor: pointer;
-}
-.directory-link:hover{
-  background:lightgray;
-}
-#map {
-  height: 100%;
-  width: calc(100% - 300px);
-  display:inline-block;
-  margin-left:300px;
-}
-#reset{
-  display:none;
-}
-
-.core-popup{
-  margin-bottom:10px;
-}
-.core-popup > p{
-  margin-top:5px;
-  margin-bottom:5px;
-}
-
-
-
-.popup-tabs {
-  font-family: Arial, sans-serif;
-  width: 250px;
-}
-
-.tab-buttons {
-  display: flex;
-  border-bottom: 1px solid #ff0505;
-  margin-bottom: 10px;
-}
-
-.tab-link {
-  flex: 1;
-  padding: 8px;
-  background-color: #ff0505;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  text-align: center;
-}
-
-.tab-link.active {
-  background-color: #fff;
-  border-bottom: 2px solid #007bff;
-}
-
-.tab-content {
-  display: none;
-  font-size: 14px;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-/* Styles for the building thumbnail in the popup */
-.popup-thumbnail {
-    width: 100%;          
-    max-height: 150px;    
-    object-fit: cover;    
-    margin-top: 10px;     
-    border-radius: 5px;   
-}
-
-
-/*SEARCH BAR*/
+/*search bar*/
 #search-bar {
-  position: relative;
-  display: inline-block;
   width: 300px;
-  position: absolute;
-  transform: translate(-50%);
-  left: 50%;
   top: 20px;
-  }
+
+}
 input[type="text"] {
   width: 80%;
   padding: 10px;
@@ -102,26 +33,47 @@ input[type="text"] {
   border: none;
   border-radius: 4px;
   background-color: #ffffff;
+  border: black 1px solid;
+  font-size:20px;
+  font-family: "EB Garamond", serif;
 }
-#suggestions {
-  position: absolute;
-  background-color: #30a6ff;
-  border-bottom: none;
-  z-index: 99;
-  top: 100%;
-  left: 0;
-  right: 0;
+/*reset button*/
+#reset{
+  display:none;
+  position: relative;
+  margin-top:10px;
+  background:white;
+  border:1px solid black;
+  padding:10px;
+  font-family: "EB Garamond", serif;
+  font-size:20px;
 }
-#suggestions div {
-  padding: 10px;
+#reset:hover{
+  cursor:pointer;
+  background:lightgray;
+}
+/*directory items*/
+#directory{
+  margin-top:10px;
+}
+.directory-link{
   cursor: pointer;
-  background-color: #ffffff;
-  border-bottom: 1px solid #d4d4d4;
 }
-#suggestions div:hover {
-  background-color: #e9e9e9;
+.directory-link:hover{
+  background:lightgray;
 }
-#suggestions-active {
-  background-color: #000000 !important;
-  color: #ffffff;
+/*MAP STYLE*/
+#map {
+  height: 100%;
+  width: calc(100% - 350px);
+  display:inline-block;
+  margin-left:350px;
+}
+/*popups*/
+.core-popup{
+  margin-bottom:10px;
+}
+.core-popup > p{
+  margin-top:5px;
+  margin-bottom:5px;
 }

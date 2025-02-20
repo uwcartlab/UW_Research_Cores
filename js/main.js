@@ -1,6 +1,6 @@
 // Initialize the map
 const map = L.map('map').setView([43.0731, -89.4012], 14);
-let reset = false, suggestions = [];
+let reset = false, directory = [];
 
 // Add a tile layer (background map)
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -8,7 +8,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
   subdomains: 'abcd',
   maxZoom: 19
 }).addTo(map);
-
+//get building data
 fetch('data/buildings.geojson')
   .then(res => res.json())
   .then(json =>{
@@ -22,40 +22,73 @@ fetch('data/buildings.geojson')
               header:true
           }).data;
           csv = data;
-          //create layer
+          //create building layer layer
           let buildings = L.geoJSON(json, {
+            filter:function(feature){
+              //create variables for core list for each building
+              let total_cores = 0, cores = [];
+              //loop through core csv
+              csv.forEach(function(c){
+                  //check if core building code matches building code
+                  if (c.Building == Number(feature.properties.building_number) && c["Should this core be visible to the public?"] == 'Yes' ){
+                    //add total cores to list
+                    total_cores++;
+                    //add building name to overall directory list
+                    directory.push(c.Name)
+                    //add core data to cores list
+                    cores.push(c)
+                  }
+              })
+              //create the search bar and enable interaction
+              createSearchBar(csv);
+              //add total core number and core list to geojson
+              feature.properties["total_cores"] = total_cores;
+              feature.properties["cores"] = cores;
+              //filter out buildings with no cores attached
+              let filter = total_cores > 0 ? true : false;
+              return filter;
+            },
             onEachFeature:function(feature,layer){
+                //function to create the list of cores
                 function createDirectory(cores, bounds){
                     cores.forEach(function(obj){ 
-                      //create popup list
+                      //create html for the core directory
                       let core = "";
                       core += "<div class='core-popup'><b>" + obj.Name + "</b>";
                       core += "<p>" + obj["Parent Organization"] + "</p>";
                       core += "<p>" + obj["Location"] + "</p></div>";
-                      //create element
+                      //create element for the directory item
                       let directoryLink = document.createElement("div");
-                      directoryLink.classList = ["directory-link"]
+                      directoryLink.classList = ["directory-link"];
+                      directoryLink.id = obj.Name.replace(/\s|\W/g, '');
                       directoryLink.innerHTML = core;
                       //directory interactions
-                      //click
+                      //click on directory item
                       directoryLink.addEventListener("click",function(elem){
-                        reset = true, fullList = false;
-                        map.fitBounds(bounds)
-                        document.querySelector("#directory").innerHTML = "";
-                        document.querySelector("#directory").insertAdjacentHTML("beforeend",core);
+                        //enable reset button
+                        reset = true
                         document.querySelector("#reset").style.display = "block";
+                        //zoom to building
+                        map.fitBounds(bounds)
+                        //clear directory of additional cores
+                        document.querySelector("#directory").innerHTML = "";
+                        //display current core's information
+                        document.querySelector("#directory").insertAdjacentHTML("beforeend",core);
                       })
-                      //hover over
-                      directoryLink.addEventListener("mouseover",function(elem){
+                      //hover over directory item coordinated viz
+                      directoryLink.addEventListener("mouseover",function(){
+                        //highlight associated building
                         layer.setStyle({
-                          fillColor:"black"
+                          color:"black",
+                          weight:2.5
                         })
                       })
                       //hover out
                       directoryLink.addEventListener("mouseout",function(elem){
+                        //reset building style
                         buildings.resetStyle();
                       })
-      
+                      
                       document.querySelector("#directory").insertAdjacentElement("beforeend",directoryLink)
                     })
                 }
@@ -65,127 +98,81 @@ fetch('data/buildings.geojson')
                 if (feature.properties.cores.length > 0){
                   createDirectory(feature.properties.cores,bounds)
                 }
-                //select layer
+                //select buildings
                 layer.on("click",function(){
+                  //activate reset button
                   reset = true;
-                  document.querySelector("#directory").innerHTML = "";
                   document.querySelector("#reset").style.display = "block";
+                  //clear directory
+                  document.querySelector("#directory").innerHTML = "";
+                  //zoom to building
                   map.fitBounds(bounds)
+                  //create directory for cores in selected building
                   createDirectory(feature.properties.cores,bounds)
                 })
                 //reset button
                 document.querySelector("#reset").addEventListener("click",function(){
+                  //if reset is activated
                   if (reset == true){
+                    //clear directory
                     document.querySelector("#directory").innerHTML = "";
+                    //remove and deactivate reset button
                     document.querySelector("#reset").style.display = "none";
                     reset = false;
+                    //clear search button
+                    document.querySelector("#search").value = "";
+                    //set map view to original 
                     map.setView([43.0731, -89.4012], 14)
                   }
+                  //create full directory
                   createDirectory(feature.properties.cores,bounds)
                 })
             },
-            filter:function(feature){
-              let total_cores = 0,
-                  cores = [];
-              csv.forEach(function(c){
-                  if (c.Building == Number(feature.properties.building_number) && c["Should this core be visible to the public?"] == 'Yes' ){
-                    total_cores++;
-                    suggestions.push(c.Name)
-                    cores.push(c)
-                  }
-              })
-              createSearchBar();
-
-              feature.properties["total_cores"] = total_cores;
-              feature.properties["cores"] = cores;
-              
-              let filter = total_cores > 0 ? true : false;
-              return filter;
-            },
+            //style map
             style: function(feature) {
-              //let fill = feature.properties["total_cores"] > 10 ? "#2b8cbe" : feature.properties["total_cores"] > 5 ? "#a6bddb" : feature.properties["total_cores"] > 0 ? "#ece7f2":"#ffffff",
-              let fill = "#ece7f2";   
-                opacity = feature.properties["total_cores"] > 0 ? 0.9: 0,
-                color = feature.properties["total_cores"] > 0 ?'blue': 'lightgray';
-
               return {
-                color: color,
+                color: "rgb(197, 5, 12)",
                 weight: 1,
-                fillColor: fill,
-                fillOpacity: 0.9
+                fillColor: "rgb(197, 5, 12)",
+                fillOpacity: 0.5
               }
             }
           }).addTo(map);
 
       })
   }) 
-.catch(error => console.error('Error fetching buildings list:', error));
-
-function createSearchBar(){
-  //search bar
+//create search bar and add functionality
+function createSearchBar(csv){
+  //get search bar element
   let search = document.getElementById("search-bar");
-  let autocomplete = document.getElementById("suggestions");
-  let currentFocus = -1; //To track the currently active suggestiom
-  //input
+  //input element
   search.addEventListener("input",function(e){
-      const query = e.target.value.toLowerCase();
-      //Get user input and convert to lowercase for case-insensitive matching
-      autocomplete.innerHTML = ""; //Clear previous autocomplete suggestions
-      currentFocus = -1; //Reset the focus index when typing new input
-      //If the input is empty dont show any suggestions
-      if (!query) return;
-      //Filter the countries based on user input
-      const filteredSuggestions = suggestions.filter((suggestion) =>
-        suggestion.toLowerCase().includes(query)
+    //if search bar is black, reveal full directory list
+    if (e.target.value.length == 0){
+      document.querySelectorAll(".directory-link").forEach(function(elem){
+        elem.style.display = "block"
+      })
+    }  
+    //get search query value
+    const query = e.target.value.toLowerCase();
+      //hide all directory items
+      document.querySelectorAll(".directory-link").forEach(function(elem){
+        elem.style.display = "none"
+      })
+      //Filter the directory values based on user input
+      const filteredSuggestions = directory.filter((item) =>
+        item.toLowerCase().includes(query)
       ) 
-      //Part 2:Create suggestions list dynamically
+      //filter directory list dynamically
       filteredSuggestions.forEach((suggestion) => {
         const item = document.createElement("div");
         item.innerHTML = suggestion; //Set the suggestion text
-        item.addEventListener("click", function () {
-          search.value = suggestion;
-          search.innerHTML = suggestion; //set the suggestion text
-          autocomplete.innerHTML = ""; //Clear the suggestion list after selection
-        });
-        autocomplete.appendChild(item); //Add the suggestion to list
+
+        let currentClass = suggestion.replace(/\s|\W/g, '');
+        if (document.querySelector("#" + currentClass)){
+          document.querySelector("#" + currentClass).style.display = "block";
+        }
       });
   })
-  //Part 3: handling keyboard navigation(arrow keys and enter)
-  search.addEventListener("keydown", function (e) {
-    let items = autocomplete.getElementsByTagName("div");
-    //get all suggestions div elements
-    if (e.key === "ArrowDown") {
-      currentFocus++;
-      highlightItem(items);
-    } else if (e.key === "ArrowUp") {
-      currentFocus--;
-      highlightItem(items);
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (currentFocus > -1 && items[currentFocus]) {
-        items[currentFocus].click();
-        }
-      } 
-  });
-  //Part 4: Function to highlight the current item
-  function highlightItem(items) {
-    if (!items) return;
-      removeActive(items);
-    //Wrap focus withon the bounds of suggestion list
-    if (currentFocus >= items.length) currentFocus = 0;
-    if (currentFocus < 0) currentFocus = items.length - 1;
-    items[currentFocus].classList.add("autocomplete-active");
-  }
-  //Part 5: Function to remove the active class from all items
-  function removeActive(items) {
-    for (let i = 0; i < items.length; i++) {
-      items[i].classList.remove("autocomplete-active");
-    }
-  }
-  //Part 6: close the autocomple list is the user click outite tje input field or list
-  document.addEventListener("click", function (e) {
-    if (!autocomplete.contains(e.target) && e.target !== search) {
-      autocomplete.innerHTML = "";
-    }
-  });
+  
 }
