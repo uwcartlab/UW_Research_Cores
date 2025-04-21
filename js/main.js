@@ -1,6 +1,6 @@
 // Initialize the map
 const map = L.map('map').setView([43.0731, -89.4012], 14);
-let reset = false, directory = [];
+let reset = false, directory = [], view = [43.0731, -89.4012], zoom = 14;
 
 // Add a tile layer (background map)
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -8,6 +8,17 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
   subdomains: 'abcd',
   maxZoom: 19
 }).addTo(map);
+//zoom buttons
+document.querySelector("#madison").addEventListener("click",function(){
+    view = [43.0731, -89.4012];  
+    zoom = 14;
+    map.flyTo(view, zoom);
+})
+document.querySelector("#wisconsin").addEventListener("click",function(){
+    view = [44.708, -90.406]; 
+    zoom = 7; 
+    map.flyTo(view, zoom);
+})
 //get building data
 fetch('data/buildings.geojson')
   .then(res => res.json())
@@ -29,7 +40,7 @@ fetch('data/buildings.geojson')
               let total_cores = 0, cores = [];
               //loop through core csv
               csv.forEach(function(c){
-                  //check if core building code matches building code
+                //check if core building code matches building code
                   if (c.Building == Number(feature.properties.building_number) && c["Should this core be visible to the public?"] == 'Yes' ){
                     //add total cores to list
                     total_cores++;
@@ -49,7 +60,7 @@ fetch('data/buildings.geojson')
               return filter;
             },
             onEachFeature:function(feature,layer){
-                //function to create the list of cores
+              //function to create the list of cores
                 function createDirectory(cores, bounds){
                     cores.forEach(function(obj){ 
                       //create html for the core directory
@@ -69,7 +80,13 @@ fetch('data/buildings.geojson')
                         reset = true
                         document.querySelector("#reset").style.display = "block";
                         //zoom to building
-                        map.fitBounds(bounds)
+                        console.log(bounds)
+                        if (feature.geometry.type != 'Point')
+                          map.fitBounds(bounds)
+                        else{
+                          let latlng = L.latLng(bounds[1], bounds[2])
+                          map.flyTo(latlng)
+                        }
                         //clear directory of additional cores
                         document.querySelector("#directory").innerHTML = "";
                         //display current core's information
@@ -78,10 +95,12 @@ fetch('data/buildings.geojson')
                       //hover over directory item coordinated viz
                       directoryLink.addEventListener("mouseover",function(){
                         //highlight associated building
-                        layer.setStyle({
-                          color:"black",
-                          weight:2.5
-                        })
+                        if (feature.geometry.type != "Point"){
+                          layer.setStyle({
+                            color:"black",
+                            weight:2.5
+                          })
+                        }
                       })
                       //hover out
                       directoryLink.addEventListener("mouseout",function(elem){
@@ -92,10 +111,16 @@ fetch('data/buildings.geojson')
                       document.querySelector("#directory").insertAdjacentElement("beforeend",directoryLink)
                     })
                 }
+                let bounds
                 //create layer bounds
-                let bounds = layer.getBounds()
+                if (feature.geometry.type == "Point"){
+                  bounds = feature.geometry.coordinates
+                }
+                else {
+                  bounds = layer.getBounds()
+                }
                 //if there is more than one core in a building, add to the directory
-                if (feature.properties.cores.length > 0){
+                if (feature.properties.cores.length > 0 && feature.geometry.type != "Point"){
                   createDirectory(feature.properties.cores,bounds)
                 }
                 //select buildings
@@ -106,7 +131,14 @@ fetch('data/buildings.geojson')
                   //clear directory
                   document.querySelector("#directory").innerHTML = "";
                   //zoom to building
-                  map.fitBounds(bounds)
+                  console.log(bounds)
+                  if (feature.geometry.type != 'Point')
+                    map.fitBounds(bounds)
+                  else{
+                    let latlng = L.latLng([bounds[1], bounds[0]])
+                    map.flyTo(latlng)
+                  }
+
                   //create directory for cores in selected building
                   createDirectory(feature.properties.cores,bounds)
                 })
@@ -122,7 +154,7 @@ fetch('data/buildings.geojson')
                     //clear search button
                     document.querySelector("#search").value = "";
                     //set map view to original 
-                    map.setView([43.0731, -89.4012], 14)
+                    map.setView(view, zoom)
                   }
                   //create full directory
                   createDirectory(feature.properties.cores,bounds)

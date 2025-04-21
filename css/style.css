@@ -20,6 +20,23 @@ h1{
   border-right:2px solid black;
   z-index:500;
 }
+/*select zoom*/
+#select-zoom > *{
+  display:inline;
+  margin-bottom:10px;
+  font-weight:bold;
+}
+#select-zoom button{
+  background:white;
+  border: 2px solid black;
+  font-family: "EB Garamond", serif;
+  font-size:16px;
+  font-weight:normal;
+}
+#select-zoom button:hover{
+  background:lightgray;
+  cursor:pointer;
+}
 /*search bar*/
 #search-bar {
   width: 300px;
@@ -40,13 +57,17 @@ input[type="text"] {
 /*reset button*/
 #reset{
   display:none;
-  position: relative;
+  position: absolute;
   margin-top:10px;
   background:white;
   border:1px solid black;
   padding:10px;
   font-family: "EB Garamond", serif;
-  font-size:20px;
+  font-weight:bold;
+  font-size:18px;
+  bottom:25px;
+  right:20px;
+  z-index:10000;
 }
 #reset:hover{
   cursor:pointer;
@@ -76,4 +97,16 @@ input[type="text"] {
 .core-popup > p{
   margin-top:5px;
   margin-bottom:5px;
+}
+@media screen and (max-width: 576px) {
+  #sidebar{
+    width:calc(100% - 30px);
+    height:calc(50% - 30px);
+    top:50%;
+  }
+  #map{
+    width:100%;
+    height:50%;
+    margin-left:0;
+  }
 }

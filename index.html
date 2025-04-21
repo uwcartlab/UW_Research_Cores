@@ -18,14 +18,21 @@
   <!--sidebar-->
   <div id="sidebar">
     <h1>UW Research Cores</h1>
+    <div id="select-zoom">
+      <p>Select View: </p>
+      <button id="wisconsin">Wisconsin</button>
+      <button id="madison">Madison</button>
+    </div>
     <div id="search-bar">
       <input id="search" autocomplete="off" type="text" placeholder="Search..">
     </div>
-    <button id="reset">Reset Map</button>
+    <!--<button id="reset">Reset Map</button>-->
     <div id="directory"></div>
   </div>
   <!--map-->
-  <div id="map"></div>
+  <div id="map">
+    <button id="reset">Reset Map</button>
+  </div>
   <!--load scripts-->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script type="text/javascript" src="lib/papaparse.js"></script>
